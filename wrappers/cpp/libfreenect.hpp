@@ -73,7 +73,9 @@ namespace Freenect {
 			freenect_set_video_callback(m_dev, freenect_video_callback);
 		}
 		virtual ~FreenectDevice() {
-			if(freenect_close_device(m_dev) < 0){} //FN_WARNING("Device did not shutdown in a clean fashion");
+			if(freenect_close_device(m_dev) < 0) {
+				//FN_WARNING("Device did not shutdown in a clean fashion");
+			}
 		}
 		void startVideo() {
 			if(freenect_start_video(m_dev) < 0) throw std::runtime_error("Cannot start RGB callback");
@@ -191,13 +193,15 @@ namespace Freenect {
 			freenect_select_subdevices(m_ctx, static_cast<freenect_device_flags>(FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA));
 			if(pthread_create(&m_thread, NULL, pthread_callback, (void*)this) != 0) throw std::runtime_error("Cannot initialize freenect thread");
 		}
-		~Freenect() {
+		virtual ~Freenect() {
 			m_stop = true;
 			for(DeviceMap::iterator it = m_devices.begin() ; it != m_devices.end() ; ++it) {
 				delete it->second;
 			}
 			pthread_join(m_thread, NULL);
-			if(freenect_shutdown(m_ctx) < 0){} //FN_WARNING("Freenect did not shutdown in a clean fashion");
+			if(freenect_shutdown(m_ctx) < 0) {
+				//FN_WARNING("Freenect did not shutdown in a clean fashion")
+			};
 		}
 		template <typename ConcreteDevice>
 		ConcreteDevice& createDevice(int _index) {

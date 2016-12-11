@@ -298,7 +298,7 @@ FN_INTERNAL int fnusb_claim_camera(freenect_device* dev)
 		ret = libusb_set_interface_alt_setting(dev->usb_cam.dev, 0, 1);
 		if (ret != 0)
 		{
-			FN_ERROR("Failed to set alternate interface #1 for K4W: %s\n", libusb_error_name(ret));
+			FN_ERROR("Failed to set alternate interface #1 for K4W: %s (%i)\n", libusb_error_name(ret), ret);
 			libusb_close(dev->usb_cam.dev);
 			dev->usb_cam.dev = NULL;
 			return ret;

@@ -43,7 +43,7 @@ namespace FreenectDriver
     Device(freenect_context* fn_ctx, int index) : Freenect::FreenectDevice(fn_ctx, index),
       color(NULL),
       depth(NULL) { }
-    ~Device()
+    virtual ~Device()
     {
       destroyStream(color);
       destroyStream(depth);
@@ -235,7 +235,7 @@ namespace FreenectDriver
       freenect_select_subdevices(m_ctx, FREENECT_DEVICE_CAMERA); // OpenNI2 doesn't use MOTOR or AUDIO
       DriverServices = &getServices();
     }
-    ~Driver() { shutdown(); }
+    virtual ~Driver() { shutdown(); }
 
     // for DriverBase
 
@@ -259,6 +259,7 @@ namespace FreenectDriver
         freenect_device* dev;
         if (freenect_open_device(m_ctx, &dev, i) == 0)
         {
+          WriteMessage("Opened device.");
           info.usbVendorId = dev->usb_cam.VID;
           info.usbProductId = dev->usb_cam.PID;
           freenect_close_device(dev);
@@ -267,6 +268,7 @@ namespace FreenectDriver
         {
           WriteMessage("Unable to open device to query VID/PID");
         }
+        WriteMessage("Initialized device.");
       }
       return ONI_STATUS_OK;
     }
@@ -279,6 +281,7 @@ namespace FreenectDriver
         {
           if (iter->second) // already open
           {
+            WriteMessage("Already opened device " + std::string(uri));
             return iter->second;
           }
           else 
@@ -287,6 +290,7 @@ namespace FreenectDriver
             int id = uri_to_devid(iter->first.uri);
             Device* device = &createDevice<Device>(id);
             iter->second = device;
+            WriteMessage("Created device.");
             return device;
           }
         }
